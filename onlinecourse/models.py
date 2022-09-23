@@ -118,10 +118,14 @@ class Question(models.Model):
     def is_get_score(self, selected_ids):
       all_answers = self.choice_set.filter(is_correct=True).count()
       selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
-      if all_answers == selected_correct:
+      selected_incorrect = self.choice_det.filter(is_correct=False, id__in=selected_ids).count()
+      if all_answers == (selected_correct - selected_incorrect):
         return True
       else:
         return False
+    
+        def __str__(self):
+            return self.questionContent
 
 
 #  <HINT> Create a Choice Model with:
@@ -130,10 +134,12 @@ class Choice(models.Model):
     # One-To-Many (or Many-To-Many if you want to reuse choices) relationship with Question
     question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
     # Choice content
-    choice_text = models.CharField(max_length=35)
+    choice_text = models.TextField(max_length=100)
     # Indicate if this choice of the question is a correct one or not
-    is_correct = models.BooleanField()
+    is_correct = models.BooleanField(default=False)
      # Other fields and methods you would like to design
+    def __str__(self):
+        return self.choice_text
 
 # <HINT> The submission model
 # One enrollment could have multiple submission
